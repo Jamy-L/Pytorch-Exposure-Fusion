@@ -51,7 +51,7 @@ def pad_stage_to_downsample(stage):
             pad_horizontal = (1, 0)
         else:
             pad_horizontal = (1, 1)
-        pad = (*pad_vertical, *pad_horizontal)
+        pad = (*pad_horizontal, *pad_vertical)
             
         padded = th.nn.functional.pad(stage,
                                       pad=pad,
@@ -89,8 +89,8 @@ def expand_stage(tensor, target_shape=None):
                                        align_corners=True)
     
     if target_shape is not None:
-        pad = (0, target_shape[0] - H,
-               0, target_shape[1] - W)
+        pad = (0, target_shape[1] - W,
+               0, target_shape[0] - H)
         
         out = th.nn.functional.pad(out,
                                    pad=pad,
