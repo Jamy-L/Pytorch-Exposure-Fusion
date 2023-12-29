@@ -12,6 +12,25 @@ from pyramids import compute_gaussian_pyramid, compute_laplacian_pyramid, merge_
 
 
 def exposure_fusion(burst, w_sat=1, w_cont=1, w_exp=1):
+    """
+
+    Parameters
+    ----------
+    burst : Tensor [N, C, H, W]
+        Input sequence of N images, C color channels, H by W images.
+    w_sat : int, optional
+        The saturation importance weight. The default is 1.
+    w_cont : int, optional
+        The contrast importance weight. The default is 1.
+    w_exp : int, optional
+        The well-exposed importance weight. The default is 1.
+
+    Returns
+    -------
+    fused_image : Tensor [C, H, W]
+        The fused image, with compressed dynamic range.
+
+    """
     gray_burst = th.mean(burst, dim=1, keepdim=True)
     
     cont = compute_contrast(gray_burst)

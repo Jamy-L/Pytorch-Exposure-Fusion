@@ -14,12 +14,12 @@ def compute_gaussian_pyramid(tensor, n_levels=4):
                                    [2, 4, 2],
                                    [1, 2, 1]]).unsqueeze(0).unsqueeze(0)/16
     
-    # treat color channels as batch
+    # Treat color channels as batch dimension
     if c == 3:
         tensor = th.cat([tensor[:, 0],
-                           tensor[:, 1],
-                           tensor[:, 2]
-                           ], dim=0).unsqueeze(1)
+                         tensor[:, 1],
+                         tensor[:, 2]
+                        ], dim=0).unsqueeze(1)
     
     
     pyramid = [tensor]
@@ -33,7 +33,7 @@ def compute_gaussian_pyramid(tensor, n_levels=4):
                                         padding='valid', stride=2))
         
     if c == 3:
-    # unpack color channels
+    # Unpack color channels
         for lvl, stage in enumerate(pyramid):
             pyramid[lvl] = th.cat([stage[:b],
                                    stage[b:2*b],
