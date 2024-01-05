@@ -11,7 +11,7 @@ import torch as th
 from pyramids import compute_gaussian_pyramid, compute_laplacian_pyramid, merge_laplacian_pyramid, collapse_pyramid
 
 
-def exposure_fusion(burst, w_sat=1, w_cont=1, w_exp=1):
+def exposure_fusion(burst, w_sat=1, w_cont=1, w_exp=1, n_levels=4):
     """
 
     Parameters
@@ -24,6 +24,8 @@ def exposure_fusion(burst, w_sat=1, w_cont=1, w_exp=1):
         The contrast importance weight. The default is 1.
     w_exp : int, optional
         The well-exposed importance weight. The default is 1.
+    n_levels: int optional
+        The number of levels in the pyramids. The default is 4
 
     Returns
     -------
@@ -37,16 +39,18 @@ def exposure_fusion(burst, w_sat=1, w_cont=1, w_exp=1):
     sat = compute_saturation(burst, gray_burst)
     exp = compute_well_exposedness(burst)
     
-    weights = cont ** w_cont + sat ** w_sat + exp ** w_exp
-    
+    weights = (cont ** w_cont) * (sat ** w_sat) * (exp ** w_exp)
     # normalise weights
     weights = weights/weights.sum(dim=0, keepdim=True)
-    
+    # Normalisation will give Nan if all frames have 0 weight at 1 pixel.
+    # In this case, all of them get the same weight
+    weights =  weights.nan_to_num(nan = 1/burst.size(0))
+
     # Get gaussian pyramid for weights and images
-    img_gaussian_pyramid = compute_gaussian_pyramid(burst)
+    img_gaussian_pyramid = compute_gaussian_pyramid(burst, n_levels=n_levels)
     img_laplacian_pyramid = compute_laplacian_pyramid(img_gaussian_pyramid)
 
-    weight_gaussian_pyramid = compute_gaussian_pyramid(weights)
+    weight_gaussian_pyramid = compute_gaussian_pyramid(weights, n_levels=n_levels)
     
     fused_laplacian_pyramid = merge_laplacian_pyramid(img_laplacian_pyramid,
                                                       weight_gaussian_pyramid)
