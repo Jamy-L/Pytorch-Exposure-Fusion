@@ -10,9 +10,11 @@ import torch as th
 def compute_gaussian_pyramid(tensor, n_levels=4):
     b, c, _, _ = tensor.size()
     assert c in [1, 3]
-    downsample_kernel = th.Tensor([[1, 2, 1],
+    downsample_kernel = th.tensor([[1, 2, 1],
                                    [2, 4, 2],
-                                   [1, 2, 1]]).unsqueeze(0).unsqueeze(0)/16
+                                   [1, 2, 1]],
+                                  device=tensor.device,
+                                  dtype=tensor.dtype).unsqueeze(0).unsqueeze(0)/16
     
     # Treat color channels as batch dimension
     if c == 3:

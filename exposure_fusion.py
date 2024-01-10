@@ -62,9 +62,12 @@ def exposure_fusion(burst, w_sat=1, w_cont=1, w_exp=1, n_levels=4):
 
 def compute_contrast(gray_burst):
     
-    k_laplacian = th.Tensor([[0,  1, 0],
+    k_laplacian = th.tensor([[0,  1, 0],
                              [1, -4, 1],
-                             [0,  1, 0]]).unsqueeze(0).unsqueeze(0)
+                             [0,  1, 0]],
+                            device=gray_burst.device,
+                            dtype=gray_burst.dtype 
+                            ).unsqueeze(0).unsqueeze(0)
     
     contrast = th.abs(
         th.nn.functional.conv2d(gray_burst, k_laplacian, padding="same")
